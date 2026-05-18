@@ -657,7 +657,7 @@ const params = new URLSearchParams(window.location.search);
 const lang = (params.get('lang') || 'es').toLowerCase();
 const ticketId = params.get('ticket_id') || '—';
 // Webhook URL from Make (passed as param or hardcoded after you create the webhook)
-const webhookUrl = params.get('webhook') || 'MAKE_WEBHOOK_URL_HERE';
+const webhookUrl = params.get('webhook') || 'https://hook.eu2.make.com/u87eg31lo0634wf6wqpbun9k3pzt1s2l';
 
 const t = translations[lang] || translations['en'];
 
