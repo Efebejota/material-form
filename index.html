@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Material Request | MP Ascensores</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2333;
+    --border: #2a3048;
+    --border-focus: #4f6ef7;
+    --accent: #4f6ef7;
+    --accent2: #7c3aed;
+    --text: #e8eaf6;
+    --text-muted: #6b7280;
+    --text-dim: #9ca3af;
+    --success: #10b981;
+    --error: #ef4444;
+    --warning: #f59e0b;
+    --radius: 10px;
+    --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 16px 80px;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(79,110,247,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,110,247,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 620px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 36px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .logo-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .ticket-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .ticket-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 28px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Guarantee toggle */
+  .guarantee-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .guarantee-btn {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .guarantee-btn input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .guarantee-btn label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: var(--transition);
+    user-select: none;
+  }
+
+  .guarantee-btn input:checked + label {
+    border-color: var(--accent);
+    background: rgba(79,110,247,0.08);
+    color: var(--accent);
+  }
+
+  .guarantee-btn label:hover {
+    border-color: var(--border-focus);
+  }
+
+  /* Form fields */
+  .field {
+    margin-bottom: 16px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .field label .req {
+    color: var(--accent);
+    margin-left: 3px;
+  }
+
+  .field input,
+  .field textarea,
+  .field select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 11px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    transition: var(--transition);
+    outline: none;
+    appearance: none;
+  }
+
+  .field input:focus,
+  .field textarea:focus,
+  .field select:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(79,110,247,0.12);
+  }
+
+  .field input.error,
+  .field textarea.error,
+  .field select.error {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
+  }
+
+  .field textarea {
+    resize: vertical;
+    min-height: 90px;
+  }
+
+  .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  .field-error {
+    font-size: 12px;
+    color: var(--error);
+    margin-top: 5px;
+    display: none;
+  }
+
+  .field-error.visible {
+    display: block;
+  }
+
+  /* Severity pills */
+  .severity-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .sev-btn {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .sev-btn input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .sev-btn label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: var(--transition);
+    user-select: none;
+  }
+
+  .sev-btn .sev-icon { font-size: 18px; }
+
+  .sev-btn input:checked + label { border-color: var(--sev-color); background: var(--sev-bg); color: var(--sev-color); }
+  .sev-btn label:hover { border-color: var(--border-focus); }
+
+  .sev-standard { --sev-color: #10b981; --sev-bg: rgba(16,185,129,0.08); }
+  .sev-urgent   { --sev-color: #f59e0b; --sev-bg: rgba(245,158,11,0.08); }
+  .sev-critical { --sev-color: #ef4444; --sev-bg: rgba(239,68,68,0.08); }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 24px 0;
+  }
+
+  /* Submit */
+  .submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: var(--radius);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    letter-spacing: 0.01em;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .submit-btn:hover { opacity: 0.92; transform: translateY(-1px); }
+  .submit-btn:active { transform: translateY(0); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .submit-btn .btn-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  /* Success state */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 48px 32px;
+  }
+
+  .success-screen.visible { display: block; }
+
+  .success-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(16,185,129,0.12);
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin: 0 auto 20px;
+    animation: scaleIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275) both;
+  }
+
+  .success-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--success);
+  }
+
+  .success-msg {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* Spinner */
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  /* Animations */
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:none; } }
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(16px);  } to { opacity:1; transform:none; } }
+  @keyframes scaleIn  { from { transform:scale(0.5); opacity:0; }        to { transform:scale(1); opacity:1; } }
+  @keyframes spin     { to { transform:rotate(360deg); } }
+  @keyframes pulse    { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="logo-row">
+      <div class="logo-icon">🏗️</div>
+      <div class="logo-text">MP Ascensores · Material Request</div>
+    </div>
+    <div class="ticket-badge" id="ticketBadge">Ticket #—</div>
+    <h1 id="mainTitle">Solicitud de Material</h1>
+    <p class="subtitle" id="mainSubtitle">Por favor, completa todos los campos para procesar la solicitud correctamente.</p>
+  </div>
+
+  <div class="card" id="formCard">
+    <form id="materialForm" novalidate>
+
+      <!-- GUARANTEE -->
+      <div class="section">
+        <div class="section-label" id="lblGuarantee">Garantía</div>
+        <div class="guarantee-row">
+          <div class="guarantee-btn">
+            <input type="radio" name="guarantee" id="gYes" value="yes" required>
+            <label for="gYes"><span>✓</span> <span id="lblYes">Sí, en garantía</span></label>
+          </div>
+          <div class="guarantee-btn">
+            <input type="radio" name="guarantee" id="gNo" value="no" required>
+            <label for="gNo"><span>✗</span> <span id="lblNo">No en garantía</span></label>
+          </div>
+        </div>
+        <div class="field-error" id="errGuarantee">Please select an option.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- ORDER INFO -->
+      <div class="section">
+        <div class="section-label" id="lblOrderInfo">Información del pedido</div>
+
+        <div class="field">
+          <label for="orderNumber"><span id="lblOrderNumber">Número de pedido original</span><span class="req">*</span></label>
+          <input type="text" id="orderNumber" placeholder="e.g. ORD-2024-0001" required>
+          <div class="field-error" id="errOrderNumber"></div>
+        </div>
+
+        <div class="field">
+          <label for="contactPerson"><span id="lblContact">Persona de contacto</span><span class="req">*</span></label>
+          <input type="text" id="contactPerson" placeholder="Nombre completo" required>
+          <div class="field-error" id="errContactPerson"></div>
+        </div>
+
+        <div class="field">
+          <label for="deliveryAddress"><span id="lblAddress">Dirección de entrega</span><span class="req">*</span></label>
+          <textarea id="deliveryAddress" placeholder="Calle, número, ciudad, código postal..." required></textarea>
+          <div class="field-error" id="errDeliveryAddress"></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- PROBLEM -->
+      <div class="section">
+        <div class="section-label" id="lblProblemSection">Descripción técnica</div>
+
+        <div class="field">
+          <label for="problemDescription"><span id="lblProblem">Descripción del problema</span><span class="req">*</span></label>
+          <textarea id="problemDescription" placeholder="Describe el problema con detalle..." required></textarea>
+          <div class="field-error" id="errProblemDescription"></div>
+        </div>
+
+        <div class="field">
+          <label for="materialNeeded"><span id="lblMaterial">Material a enviar</span><span class="req">*</span></label>
+          <textarea id="materialNeeded" placeholder="Referencia, descripción, cantidad..." required></textarea>
+          <div class="field-error" id="errMaterialNeeded"></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- SEVERITY -->
+      <div class="section">
+        <div class="section-label" id="lblSeveritySection">Severidad</div>
+        <div class="severity-row">
+          <div class="sev-btn sev-standard">
+            <input type="radio" name="severity" id="sevStandard" value="Standard" required>
+            <label for="sevStandard"><span class="sev-icon">🟢</span><span id="lblStandard">Standard</span></label>
+          </div>
+          <div class="sev-btn sev-urgent">
+            <input type="radio" name="severity" id="sevUrgent" value="Urgent" required>
+            <label for="sevUrgent"><span class="sev-icon">🟡</span><span id="lblUrgent">Urgent</span></label>
+          </div>
+          <div class="sev-btn sev-critical">
+            <input type="radio" name="severity" id="sevCritical" value="Critical" required>
+            <label for="sevCritical"><span class="sev-icon">🔴</span><span id="lblCritical">Critical</span></label>
+          </div>
+        </div>
+        <div class="field-error" id="errSeverity"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <span class="btn-inner">
+          <span id="btnText">Enviar solicitud</span>
+          <div class="spinner" id="spinner"></div>
+        </span>
+      </button>
+
+    </form>
+
+    <!-- SUCCESS -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">✓</div>
+      <div class="success-title" id="successTitle">¡Solicitud enviada!</div>
+      <div class="success-msg" id="successMsg">Tu solicitud ha sido recibida y procesada. El equipo correspondiente recibirá la información en breve.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── i18n ───────────────────────────────────────────────────────────────────
+const translations = {
+  es: {
+    title: "Solicitud de Material",
+    subtitle: "Por favor, completa todos los campos para procesar la solicitud correctamente.",
+    guarantee: "Garantía",
+    yes: "Sí, en garantía",
+    no: "No en garantía",
+    orderInfo: "Información del pedido",
+    orderNumber: "Número de pedido original",
+    contact: "Persona de contacto",
+    address: "Dirección de entrega",
+    problemSection: "Descripción técnica",
+    problem: "Descripción del problema",
+    material: "Material a enviar",
+    severitySection: "Severidad",
+    standard: "Estándar",
+    urgent: "Urgente",
+    critical: "Crítico",
+    btn: "Enviar solicitud",
+    sending: "Enviando...",
+    successTitle: "¡Solicitud enviada!",
+    successMsg: "Tu solicitud ha sido recibida y procesada. El equipo correspondiente recibirá la información en breve.",
+    errRequired: "Este campo es obligatorio.",
+    errGuarantee: "Por favor, indica si el ascensor está en garantía.",
+    errSeverity: "Por favor, selecciona la severidad.",
+    placeholderOrder: "ej. ORD-2024-0001",
+    placeholderContact: "Nombre completo",
+    placeholderAddress: "Calle, número, ciudad, código postal...",
+    placeholderProblem: "Describe el problema con detalle...",
+    placeholderMaterial: "Referencia, descripción, cantidad...",
+    ticketLabel: "Ticket"
+  },
+  en: {
+    title: "Material Request",
+    subtitle: "Please complete all fields to process the request correctly.",
+    guarantee: "Warranty",
+    yes: "Yes, under warranty",
+    no: "Not under warranty",
+    orderInfo: "Order Information",
+    orderNumber: "Original order number",
+    contact: "Contact person",
+    address: "Delivery address",
+    problemSection: "Technical description",
+    problem: "Problem description",
+    material: "Material to be sent",
+    severitySection: "Severity",
+    standard: "Standard",
+    urgent: "Urgent",
+    critical: "Critical",
+    btn: "Submit request",
+    sending: "Sending...",
+    successTitle: "Request submitted!",
+    successMsg: "Your request has been received and processed. The relevant team will receive the information shortly.",
+    errRequired: "This field is required.",
+    errGuarantee: "Please indicate whether the elevator is under warranty.",
+    errSeverity: "Please select a severity level.",
+    placeholderOrder: "e.g. ORD-2024-0001",
+    placeholderContact: "Full name",
+    placeholderAddress: "Street, number, city, postal code...",
+    placeholderProblem: "Describe the problem in detail...",
+    placeholderMaterial: "Reference, description, quantity...",
+    ticketLabel: "Ticket"
+  },
+  fr: {
+    title: "Demande de matériel",
+    subtitle: "Veuillez compléter tous les champs pour traiter la demande correctement.",
+    guarantee: "Garantie",
+    yes: "Oui, sous garantie",
+    no: "Hors garantie",
+    orderInfo: "Informations de commande",
+    orderNumber: "Numéro de commande original",
+    contact: "Personne de contact",
+    address: "Adresse de livraison",
+    problemSection: "Description technique",
+    problem: "Description du problème",
+    material: "Matériel à envoyer",
+    severitySection: "Sévérité",
+    standard: "Standard",
+    urgent: "Urgent",
+    critical: "Critique",
+    btn: "Envoyer la demande",
+    sending: "Envoi en cours...",
+    successTitle: "Demande envoyée !",
+    successMsg: "Votre demande a été reçue et traitée. L'équipe concernée recevra les informations sous peu.",
+    errRequired: "Ce champ est obligatoire.",
+    errGuarantee: "Veuillez indiquer si l'ascenseur est sous garantie.",
+    errSeverity: "Veuillez sélectionner un niveau de sévérité.",
+    placeholderOrder: "ex. ORD-2024-0001",
+    placeholderContact: "Nom complet",
+    placeholderAddress: "Rue, numéro, ville, code postal...",
+    placeholderProblem: "Décrivez le problème en détail...",
+    placeholderMaterial: "Référence, description, quantité...",
+    ticketLabel: "Ticket"
+  },
+  de: {
+    title: "Materialanforderung",
+    subtitle: "Bitte füllen Sie alle Felder aus, um die Anfrage korrekt zu bearbeiten.",
+    guarantee: "Garantie",
+    yes: "Ja, unter Garantie",
+    no: "Keine Garantie",
+    orderInfo: "Bestellinformationen",
+    orderNumber: "Ursprüngliche Bestellnummer",
+    contact: "Kontaktperson",
+    address: "Lieferadresse",
+    problemSection: "Technische Beschreibung",
+    problem: "Problembeschreibung",
+    material: "Zu sendendes Material",
+    severitySection: "Schweregrad",
+    standard: "Standard",
+    urgent: "Dringend",
+    critical: "Kritisch",
+    btn: "Anfrage senden",
+    sending: "Wird gesendet...",
+    successTitle: "Anfrage gesendet!",
+    successMsg: "Ihre Anfrage wurde empfangen und bearbeitet. Das zuständige Team erhält die Informationen in Kürze.",
+    errRequired: "Dieses Feld ist erforderlich.",
+    errGuarantee: "Bitte geben Sie an, ob der Aufzug unter Garantie steht.",
+    errSeverity: "Bitte wählen Sie einen Schweregrad.",
+    placeholderOrder: "z.B. ORD-2024-0001",
+    placeholderContact: "Vollständiger Name",
+    placeholderAddress: "Straße, Nummer, Stadt, Postleitzahl...",
+    placeholderProblem: "Beschreiben Sie das Problem im Detail...",
+    placeholderMaterial: "Referenz, Beschreibung, Menge...",
+    ticketLabel: "Ticket"
+  }
+};
+
+// ─── Read URL params ─────────────────────────────────────────────────────────
+const params = new URLSearchParams(window.location.search);
+const lang = (params.get('lang') || 'es').toLowerCase();
+const ticketId = params.get('ticket_id') || '—';
+// Webhook URL from Make (passed as param or hardcoded after you create the webhook)
+const webhookUrl = params.get('webhook') || 'MAKE_WEBHOOK_URL_HERE';
+
+const t = translations[lang] || translations['en'];
+
+// ─── Apply translations ──────────────────────────────────────────────────────
+document.documentElement.lang = lang;
+document.getElementById('ticketBadge').textContent = `${t.ticketLabel} #${ticketId}`;
+document.getElementById('mainTitle').textContent = t.title;
+document.getElementById('mainSubtitle').textContent = t.subtitle;
+document.getElementById('lblGuarantee').textContent = t.guarantee;
+document.getElementById('lblYes').textContent = t.yes;
+document.getElementById('lblNo').textContent = t.no;
+document.getElementById('lblOrderInfo').textContent = t.orderInfo;
+document.getElementById('lblOrderNumber').textContent = t.orderNumber;
+document.getElementById('lblContact').textContent = t.contact;
+document.getElementById('lblAddress').textContent = t.address;
+document.getElementById('lblProblemSection').textContent = t.problemSection;
+document.getElementById('lblProblem').textContent = t.problem;
+document.getElementById('lblMaterial').textContent = t.material;
+document.getElementById('lblSeveritySection').textContent = t.severitySection;
+document.getElementById('lblStandard').textContent = t.standard;
+document.getElementById('lblUrgent').textContent = t.urgent;
+document.getElementById('lblCritical').textContent = t.critical;
+document.getElementById('btnText').textContent = t.btn;
+document.getElementById('successTitle').textContent = t.successTitle;
+document.getElementById('successMsg').textContent = t.successMsg;
+
+// Placeholders
+document.getElementById('orderNumber').placeholder = t.placeholderOrder;
+document.getElementById('contactPerson').placeholder = t.placeholderContact;
+document.getElementById('deliveryAddress').placeholder = t.placeholderAddress;
+document.getElementById('problemDescription').placeholder = t.placeholderProblem;
+document.getElementById('materialNeeded').placeholder = t.placeholderMaterial;
+
+// ─── Validation ──────────────────────────────────────────────────────────────
+function showError(fieldId, errId, msg) {
+  const field = document.getElementById(fieldId);
+  const err = document.getElementById(errId);
+  if (field) field.classList.add('error');
+  if (err) { err.textContent = msg; err.classList.add('visible'); }
+}
+
+function clearError(fieldId, errId) {
+  const field = document.getElementById(fieldId);
+  const err = document.getElementById(errId);
+  if (field) field.classList.remove('error');
+  if (err) { err.textContent = ''; err.classList.remove('visible'); }
+}
+
+// Clear errors on interaction
+['orderNumber','contactPerson','deliveryAddress','problemDescription','materialNeeded'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', () => clearError(id, 'err' + id.charAt(0).toUpperCase() + id.slice(1)));
+});
+
+document.querySelectorAll('input[name="guarantee"]').forEach(r => {
+  r.addEventListener('change', () => {
+    document.getElementById('errGuarantee').classList.remove('visible');
+  });
+});
+
+document.querySelectorAll('input[name="severity"]').forEach(r => {
+  r.addEventListener('change', () => {
+    document.getElementById('errSeverity').classList.remove('visible');
+  });
+});
+
+// ─── Submit ──────────────────────────────────────────────────────────────────
+document.getElementById('materialForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  let valid = true;
+
+  // Guarantee
+  const guarantee = document.querySelector('input[name="guarantee"]:checked');
+  if (!guarantee) {
+    document.getElementById('errGuarantee').textContent = t.errGuarantee;
+    document.getElementById('errGuarantee').classList.add('visible');
+    valid = false;
+  }
+
+  // Text fields
+  const fields = [
+    { id: 'orderNumber',        errId: 'errOrderNumber' },
+    { id: 'contactPerson',      errId: 'errContactPerson' },
+    { id: 'deliveryAddress',    errId: 'errDeliveryAddress' },
+    { id: 'problemDescription', errId: 'errProblemDescription' },
+    { id: 'materialNeeded',     errId: 'errMaterialNeeded' }
+  ];
+
+  fields.forEach(({ id, errId }) => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) {
+      showError(id, errId, t.errRequired);
+      valid = false;
+    } else {
+      clearError(id, errId);
+    }
+  });
+
+  // Severity
+  const severity = document.querySelector('input[name="severity"]:checked');
+  if (!severity) {
+    document.getElementById('errSeverity').textContent = t.errSeverity;
+    document.getElementById('errSeverity').classList.add('visible');
+    valid = false;
+  }
+
+  if (!valid) return;
+
+  // Build payload
+  const payload = {
+    ticket_id:    ticketId,
+    lang:         lang,
+    guarantee:    guarantee.value,
+    order_number: document.getElementById('orderNumber').value.trim(),
+    contact:      document.getElementById('contactPerson').value.trim(),
+    address:      document.getElementById('deliveryAddress').value.trim(),
+    problem:      document.getElementById('problemDescription').value.trim(),
+    material:     document.getElementById('materialNeeded').value.trim(),
+    severity:     severity.value,
+    submitted_at: new Date().toISOString()
+  };
+
+  // Show loading
+  const btn = document.getElementById('submitBtn');
+  const btnText = document.getElementById('btnText');
+  const spinner = document.getElementById('spinner');
+  btn.disabled = true;
+  btnText.textContent = t.sending;
+  spinner.style.display = 'block';
+
+  try {
+    await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      mode: 'no-cors'
+    });
+
+    // Show success
+    document.getElementById('materialForm').style.display = 'none';
+    document.getElementById('successScreen').classList.add('visible');
+
+  } catch (err) {
+    btn.disabled = false;
+    btnText.textContent = t.btn;
+    spinner.style.display = 'none';
+    alert('Error sending request. Please try again.');
+  }
+});
+</script>
+</body>
+</html>
